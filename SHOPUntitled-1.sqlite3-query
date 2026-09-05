@@ -1,0 +1,72 @@
+-- database: ./shop.db
+
+CREATE TABLE products (
+    product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    price REAL NOT NULL
+);
+
+CREATE TABLE customers ( customer_id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT NOT NULL UNIQUE );
+
+CREATE TABLE orders ( order_id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER NOT NULL, product_id INTEGER NOT NULL, quantity INTEGER NOT NULL, order_date DATE NOT NULL, FOREIGN KEY (customer_id) REFERENCES customers(customer_id), FOREIGN KEY (product_id) REFERENCES products(product_id) );
+
+INSERT INTO products (name, category, price) VALUES 
+('Smartphone', 'Electronics', 699.99),
+('Headphones', 'Electronics', 149.99),
+('Keyboard', 'Electronics', 79.99),
+('Mouse', 'Electronics', 39.99),
+('Monitor', 'Electronics', 299.99),
+('Backpack', 'Accessories', 59.99),
+('Watch', 'Accessories', 199.99),
+('T-Shirt', 'Clothing', 29.99),
+('Sneakers', 'Clothing', 89.99),
+('Coffee Maker', 'Home', 129.99);
+
+INSERT INTO customers (first_name, last_name, email) VALUES 
+('John', 'Smith', 'john.smith@gmail.com'),
+('Emma', 'Johnson', 'emma.johnson@gmail.com'),
+('Michael', 'Brown', 'michael.brown@gmail.com'),
+('Sophia', 'Davis', 'sophia.davis@gmail.com'),
+('James', 'Wilson', 'james.wilson@gmail.com'),
+('Olivia', 'Taylor', 'olivia.taylor@gmail.com'),
+('Daniel', 'Anderson', 'daniel.anderson@gmail.com'),
+('Ava', 'Thomas', 'ava.thomas@gmail.com'),
+('William', 'Moore', 'william.moore@gmail.com'),
+('Isabella', 'Martin', 'isabella.martin@gmail.com');
+
+INSERT INTO orders (customer_id, product_id, quantity, order_date) VALUES 
+(1, 1, 1, '2026-09-01'),
+(2, 3, 2, '2026-09-01'),
+(3, 2, 1, '2026-09-02'),
+(4, 5, 1, '2026-09-02'),
+(5, 4, 3, '2026-09-03'),
+(6, 6, 1, '2026-09-03'),
+(7, 7, 2, '2026-09-04'),
+(8, 8, 2, '2026-09-04'),
+(9, 9, 1, '2026-09-05'),
+(10, 10, 1, '2026-09-05');
+
+SELECT SUM(products.price * orders.quantity) AS total_revenue FROM orders
+JOIN products ON orders.product_id = products.product_id;
+
+SELECT AVG(products.price * orders.quantity) AS average_revenue FROM orders
+JOIN products ON orders.product_id = products.product_id;
+
+SELECT customers.first_name, customers.last_name, COUNT(orders.order_id) AS total_orders
+FROM customers
+JOIN orders ON customers.customer_id = orders.customer_id
+GROUP BY customers.customer_id;
+
+SELECT products.category, SUM(orders.quantity) AS total_quantity_sold 
+FROM products
+JOIN orders ON products.product_id = orders.product_id
+GROUP BY products.category
+ORDER BY total_quantity_sold DESC
+LIMIT 1;
+
+SELECT products.category, COUNT(products.name) AS total_products
+FROM products
+GROUP BY products.category;
+
+UPDATE products SET price = price * 1.1 WHERE category = 'Electronics';
